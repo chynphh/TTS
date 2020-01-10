@@ -9,6 +9,8 @@ import torch.distributed as dist
 from torch.utils.data.sampler import Sampler
 from torch.autograd import Variable
 from torch._utils import _flatten_dense_tensors, _unflatten_dense_tensors
+import sys
+sys.path.append("/home/chenghao03/tts")
 from TTS.utils.generic_utils import load_config, create_experiment_folder
 
 

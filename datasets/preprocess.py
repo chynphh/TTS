@@ -3,9 +3,10 @@ from glob import glob
 import re
 import sys
 from TTS.utils.generic_utils import split_dataset
-
+from tqdm import tqdm
 
 def load_meta_data(datasets):
+    print(" > Start loading data...")
     meta_data_train_all = []
     meta_data_eval_all = []
     for dataset in datasets:
@@ -186,4 +187,41 @@ def libri_tts(root_path, meta_files=None):
                 items.append([text, wav_file, speaker_name])
     for item in items:
         assert os.path.exists(item[1]), f" [!] wav file is not exist - {item[1]}"
+    return items
+
+def aidatatang_tts(roo_path, meta_files=None):
+    print("starting load data")
+    items = []
+    corpus = ['train', 'dev', 'test']
+    # items.append([text, wav_file, speaker_name])
+    
+    # get all speaker
+    speaker_folders = []
+    for corpu in corpus:
+        for filename in os.listdir(os.path.join(roo_path, corpu)):
+            if len(filename) == 5 and filename[0] == 'G':
+                speaker_folders.append(os.path.join(roo_path, corpu, filename))
+
+    # get all speaker info and data
+    for speaker_folder in tqdm(speaker_folders):
+        speaker_name = speaker_folder[-5:]
+        for file in os.listdir(speaker_folder):
+            if file.endswith(".txt"):
+                basename = file[:-4]
+                wav_name = os.path.join(speaker_folder, basename+".wav") 
+                with open(os.path.join(speaker_folder, file)) as f:
+                    text = f.readline().strip()
+                items.append([text, wav_name, speaker_name])
+
+def aidatatang_tts2(root_path, meta_files=None):
+    print("starting load data")
+    items = []
+    with open(os.path.join(root_path, 'all_data.txt')) as f:
+        lines = f.readlines()
+    # get all speaker info and data
+    for line in lines:
+        sline = line.strip().split("\t")
+        text, wav_name, speaker_name = sline[0], sline[1], sline[2]
+        items.append([text.strip(), wav_name, speaker_name])
+    # print(items)
     return items

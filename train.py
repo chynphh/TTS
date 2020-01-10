@@ -1,9 +1,10 @@
 import argparse
 import os
 import sys
+sys.path.append("/home/chenghao03/tts")
+
 import time
 import traceback
-
 import numpy as np
 import torch
 import torch.nn as nn
@@ -274,6 +275,7 @@ def train(model, criterion, criterion_st, optimizer, optimizer_st, scheduler,
                                           {'TrainAudio': train_audio},
                                           c.audio["sample_rate"])
         end_time = time.time()
+        print(start_time-end_time)
 
     # print epoch stats
     print("   | > EPOCH END -- GlobalStep:{}  AvgTotalLoss:{:.5f}  "
