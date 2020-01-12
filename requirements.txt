@@ -1,7 +1,7 @@
-numpy
+numpy==1.14.3
 torch>=0.4.1
-librosa
-Unidecode
+librosa==0.5.1
+Unidecode==0.4.20
 tensorboard
 tensorboardX
 matplotlib==2.0.2
@@ -9,5 +9,4 @@ Pillow
 flask
 scipy
 tqdm
-git+git://github.com/bootphon/phonemizer@master
 soundfile

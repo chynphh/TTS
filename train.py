@@ -275,7 +275,7 @@ def train(model, criterion, criterion_st, optimizer, optimizer_st, scheduler,
                                           {'TrainAudio': train_audio},
                                           c.audio["sample_rate"])
         end_time = time.time()
-        print(start_time-end_time)
+        # print(start_time-end_time)
 
     # print epoch stats
     print("   | > EPOCH END -- GlobalStep:{}  AvgTotalLoss:{:.5f}  "
@@ -329,6 +329,15 @@ def evaluate(model, criterion, criterion_st, ap, global_step, epoch):
     else:
         with open(c.test_sentences_file, "r") as f:
             test_sentences = [s.strip() for s in f.readlines()]
+    test_sentences_with_speaker_id = []
+    for sentence in test_sentences:
+        ss = sentence.split("|")
+        if len(ss) == 1:
+            speaker_id = 0 if c.use_speaker_embedding else None
+        else:
+            speaker_id = int(ss[1])
+        test_sentences_with_speaker_id.append((sentence, speaker_id))
+    
     with torch.no_grad():
         if data_loader is not None:
             for num_iter, data in enumerate(data_loader):
@@ -470,9 +479,8 @@ def evaluate(model, criterion, criterion_st, ap, global_step, epoch):
         test_audios = {}
         test_figures = {}
         print(" | > Synthesizing test sentences")
-        speaker_id = 0 if c.use_speaker_embedding else None
         style_wav = c.get("style_wav_for_test")
-        for idx, test_sentence in enumerate(test_sentences):
+        for idx, (test_sentence, speaker_id) in enumerate(test_sentences_with_speaker_id):
             try:
                 wav, alignment, decoder_output, postnet_output, stop_tokens = synthesis(
                     model,
@@ -485,12 +493,12 @@ def evaluate(model, criterion, criterion_st, ap, global_step, epoch):
                 file_path = os.path.join(AUDIO_PATH, str(global_step))
                 os.makedirs(file_path, exist_ok=True)
                 file_path = os.path.join(file_path,
-                                         "TestSentence_{}.wav".format(idx))
+                                         "TestSentence_{}_{}.wav".format(idx, speaker_id))
                 ap.save_wav(wav, file_path)
-                test_audios['{}-audio'.format(idx)] = wav
-                test_figures['{}-prediction'.format(idx)] = plot_spectrogram(
+                test_audios['{}-{}-audio'.format(idx, speaker_id)] = wav
+                test_figures['{}-{}-prediction'.format(idx, speaker_id)] = plot_spectrogram(
                     postnet_output, ap)
-                test_figures['{}-alignment'.format(idx)] = plot_alignment(
+                test_figures['{}-{}-alignment'.format(idx, speaker_id)] = plot_alignment(
                     alignment)
             except:
                 print(" !! Error creating Test Sentence -", idx)

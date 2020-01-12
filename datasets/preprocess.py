@@ -213,10 +213,10 @@ def aidatatang_tts(roo_path, meta_files=None):
                     text = f.readline().strip()
                 items.append([text, wav_name, speaker_name])
 
-def aidatatang_tts2(root_path, meta_files=None):
+def aidatatang_tts2(file_path, meta_files=None):
     print("starting load data")
     items = []
-    with open(os.path.join(root_path, 'all_data.txt')) as f:
+    with open(file_path) as f:
         lines = f.readlines()
     # get all speaker info and data
     for line in lines:
